@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Домашнее задание 2 · Карта моих 4К · АСИ</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0b0f12;
+    font-family:'Segoe UI','Inter',system-ui,sans-serif;
+    color:#e3f0f2;
+    min-height:100vh;
+    padding:24px 16px 140px;
+    display:flex;
+    justify-content:center;
+  }
+  .app { max-width:980px; width:100%; }
+  .app-header {
+    background:linear-gradient(135deg,#0f1e22 0%,#0c1a1e 100%);
+    border:1px solid #1e4a50;
+    border-radius:24px;
+    padding:28px 32px;
+    margin-bottom:22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .app-header::before {
+    content:'';
+    position:absolute;
+    top:-80px; right:-80px;
+    width:260px; height:260px;
+    background:radial-gradient(circle,rgba(58,209,217,0.18) 0%,transparent 70%);
+    border-radius:50%;
+  }
+  .app-header .eyebrow {
+    color:#3ad1d9;
+    font-size:0.72rem;
+    letter-spacing:2px;
+    font-weight:800;
+    text-transform:uppercase;
+    margin-bottom:8px;
+    position:relative;
+  }
+  .app-header h1 {
+    font-size:1.9rem;
+    font-weight:700;
+    margin-bottom:6px;
+    position:relative;
+  }
+  .app-header h1 span { color:#3ad1d9; }
+  .app-header p {
+    color:#9bb8bd;
+    font-size:0.95rem;
+    position:relative;
+    max-width:640px;
+  }
+  .chips {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:16px;
+    position:relative;
+  }
+  .chip {
+    border:1px solid #2a6b72;
+    border-radius:8px;
+    padding:6px 12px;
+    font-weight:700;
+    font-size:0.82rem;
+    background:#0f2226;
+    color:#c8dee2;
+  }
+  .chip span { color:#3ad1d9; margin-right:6px; }
+
+  .progress-wrap {
+    background:#0f1f24;
+    border:1px solid #1d464d;
+    border-radius:16px;
+    padding:16px 22px;
+    margin-bottom:22px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .progress-text {
+    font-size:0.85rem;
+    font-weight:600;
+    color:#3ad1d9;
+    white-space:nowrap;
+    letter-spacing:0.5px;
+  }
+  .progress-bar {
+    flex:1;
+    height:10px;
+    background:#0a1519;
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .progress-fill {
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#2aa9b0 0%,#3ad1d9 100%);
+    border-radius:10px;
+    transition:width 0.4s ease;
+  }
+  .progress-percent {
+    font-weight:700;
+    color:#3ad1d9;
+    font-size:0.95rem;
+    min-width:48px;
+    text-align:right;
+  }
+
+  .card {
+    background:rgba(13,25,30,0.7);
+    border:1px solid #1e3f45;
+    border-radius:22px;
+    padding:28px 30px;
+    margin-bottom:20px;
+    transition:border-color 0.2s;
+  }
+  .card:hover { border-color:#2a7a82; }
+  .card-tag {
+    display:inline-block;
+    background:#1a3a40;
+    color:#3ad1d9;
+    font-weight:700;
+    font-size:0.75rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    padding:5px 14px;
+    border-radius:20px;
+    margin-bottom:14px;
+    border:1px solid #2a6b72;
+  }
+  .card h2 {
+    font-size:1.4rem;
+    color:#fff;
+    margin-bottom:12px;
+    font-weight:700;
+  }
+  .card h2 .accent { color:#3ad1d9; }
+  .card p.desc {
+    color:#bdd6da;
+    font-size:0.98rem;
+    line-height:1.6;
+    margin-bottom:18px;
+  }
+
+  .input-group { margin-bottom:16px; }
+  .input-group label {
+    display:block;
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#6f9ca3;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .input-group input[type="text"],
+  .input-group textarea {
+    width:100%;
+    background:#0a1519;
+    border:1.5px solid #1e4a50;
+    border-radius:12px;
+    padding:12px 16px;
+    color:#e3f0f2;
+    font-size:1rem;
+    font-family:inherit;
+    transition:border-color 0.2s;
+    outline:none;
+  }
+  .input-group input:focus,
+  .input-group textarea:focus {
+    border-color:#3ad1d9;
+    box-shadow:0 0 0 3px rgba(58,209,217,0.15);
+  }
+  .input-group textarea {
+    resize:vertical;
+    min-height:90px;
+  }
+  .input-group input::placeholder,
+  .input-group textarea::placeholder { color:#4f6b6f; }
+
+  .options {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin:14px 0;
+  }
+  .options label {
+    border:1.5px solid #1e4a50;
+    border-radius:12px;
+    padding:14px 16px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:#0e1c21;
+    cursor:pointer;
+    transition:all 0.2s;
+    font-size:0.95rem;
+    color:#d3e7ea;
+  }
+  .options label:hover { border-color:#2a7a82; }
+  .options input {
+    accent-color:#3ad1d9;
+    margin-top:5px;
+    flex-shrink:0;
+  }
+  .options label:has(input:checked) {
+    border-color:#3ad1d9;
+    background:#122b31;
+    box-shadow:0 0 0 3px rgba(58,209,217,0.12);
+    color:#3ad1d9;
+  }
+
+  .mapwrap {
+    overflow-x:auto;
+    margin-top:16px;
+    padding-bottom:6px;
+  }
+  .mindmap {
+    min-width:720px;
+    display:grid;
+    grid-template-columns:1fr 240px 1fr;
+    grid-template-rows:auto auto auto;
+    gap:12px;
+    align-items:stretch;
+    padding:18px;
+    border:1px solid #2a6b72;
+    background:#0a1519;
+    border-radius:14px;
+  }
+  .maptitle {
+    grid-column:1/4;
+    text-align:center;
+    color:#3ad1d9;
+    font-weight:800;
+    letter-spacing:1.5px;
+    font-size:0.75rem;
+    text-transform:uppercase;
+  }
+  .mapcenter {
+    grid-column:2;
+    grid-row:2;
+    background:linear-gradient(135deg,#2aa9b0,#3ad1d9);
+    color:#0b0f12;
+    border-radius:12px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:8px;
+    min-height:170px;
+    position:relative;
+  }
+  .mapcenter:before,
+  .mapcenter:after {
+    content:"";
+    position:absolute;
+    height:2px;
+    background:#2a7a82;
+    width:22px;
+    top:50%;
+  }
+  .mapcenter:before { left:-22px; }
+  .mapcenter:after { right:-22px; }
+  .mapcenter b {
+    font-size:0.95rem;
+    letter-spacing:1px;
+  }
+  .mapcenter label {
+    font-size:0.75rem;
+    font-weight:700;
+    color:#0b0f12;
+  }
+  .mapcenter input {
+    background:#0b0f12;
+    border:1.5px solid #0b0f12;
+    color:#e3f0f2;
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:0.9rem;
+    font-family:inherit;
+    outline:none;
+    width:100%;
+  }
+  .mapcenter input:focus { border-color:#0b0f12; box-shadow:0 0 0 3px rgba(11,15,18,0.4); }
+
+  .mapbranch {
+    border:1px solid #1e4a50;
+    border-radius:12px;
+    padding:14px;
+    background:#0e1c21;
+  }
+  .mapbranch h3 {
+    font-size:0.85rem;
+    color:#3ad1d9;
+    margin:0 0 6px;
+    letter-spacing:0.5px;
+  }
+  .mapbranch p {
+    font-size:0.78rem;
+    color:#8fb0b5;
+    margin:0 0 10px;
+    line-height:1.4;
+  }
+  .mapbranch textarea {
+    min-height:110px;
+    background:#0a1519;
+    border:1.5px solid #1e4a50;
+    color:#e3f0f2;
+    font-size:0.88rem;
+    border-radius:10px;
+    padding:10px 12px;
+    width:100%;
+    font-family:inherit;
+    resize:vertical;
+    outline:none;
+  }
+  .mapbranch textarea:focus { border-color:#3ad1d9; }
+  .creative { grid-column:1; grid-row:2; }
+  .critical { grid-column:3; grid-row:2; }
+  .comm { grid-column:1; grid-row:3; }
+  .coop { grid-column:3; grid-row:3; }
+  .connection {
+    grid-column:2;
+    grid-row:3;
+    border:1px dashed #2a7a82;
+    border-radius:12px;
+    padding:12px;
+    align-self:stretch;
+    background:#0e1c21;
+  }
+  .connection label {
+    color:#3ad1d9;
+    font-size:0.78rem;
+    font-weight:800;
+    display:block;
+    margin-bottom:8px;
+    letter-spacing:0.5px;
+  }
+  .connection textarea {
+    min-height:110px;
+    background:#0a1519;
+    border:1.5px solid #1e4a50;
+    color:#e3f0f2;
+    border-radius:10px;
+    padding:10px 12px;
+    width:100%;
+    font-family:inherit;
+    font-size:0.86rem;
+    resize:vertical;
+    outline:none;
+  }
+  .connection textarea:focus { border-color:#3ad1d9; }
+  .mapnote {
+    font-size:0.82rem;
+    color:#6f9ca3;
+    margin:10px 0 0;
+  }
+
+  .btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:linear-gradient(135deg,#2aa9b0,#3ad1d9);
+    color:#0b0f12;
+    border:none;
+    border-radius:60px;
+    padding:14px 30px;
+    font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
+    transition:all 0.2s;
+    font-family:inherit;
+    letter-spacing:0.3px;
+    box-shadow:0 8px 24px rgba(42,169,176,0.35);
+  }
+  .btn:hover {
+    transform:translateY(-2px);
+    box-shadow:0 12px 32px rgba(58,209,217,0.5);
+  }
+  .btn:disabled {
+    opacity:0.4;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+  }
+  .btn.secondary {
+    background:transparent;
+    color:#3ad1d9;
+    border:1.5px solid #2a7a82;
+    box-shadow:none;
+  }
+  .btn.secondary:hover {
+    background:#122b31;
+    border-color:#3ad1d9;
+  }
+
+  .bottom-bar {
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background:rgba(11,15,18,0.95);
+    backdrop-filter:blur(12px);
+    border-top:1px solid #1e4a50;
+    padding:16px 24px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    z-index:100;
+    flex-wrap:wrap;
+  }
+  .bottom-bar .btn { padding:12px 26px; font-size:0.95rem; }
+
+  .modal-overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:200;
+  }
+  .modal-overlay.show { display:flex; }
+  .modal {
+    background:#0d1418;
+    border:1px solid #2aa9b0;
+    border-radius:24px;
+    padding:32px;
+    max-width:640px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+  }
+  .modal h3 {
+    color:#3ad1d9;
+    font-size:1.35rem;
+    margin-bottom:14px;
+  }
+  .modal p {
+    color:#bdd6da;
+    margin-bottom:16px;
+    line-height:1.5;
+    font-size:0.95rem;
+  }
+  .modal textarea {
+    width:100%;
+    min-height:280px;
+    background:#0a1519;
+    border:1.5px solid #1e4a50;
+    border-radius:12px;
+    padding:14px;
+    color:#e3f0f2;
+    font-family:'Consolas','Monaco',monospace;
+    font-size:0.82rem;
+    line-height:1.55;
+    resize:vertical;
+    outline:none;
+  }
+  .modal textarea:focus { border-color:#3ad1d9; }
+  .modal-actions {
+    display:flex;
+    gap:12px;
+    margin-top:18px;
+    flex-wrap:wrap;
+  }
+
+  @media (max-width:700px) {
+    .app-header { padding:22px 20px; }
+    .app-header h1 { font-size:1.45rem; }
+    .card { padding:22px 18px; }
+    .options { grid-template-columns:1fr; }
+    .bottom-bar { padding:12px 14px; }
+    .bottom-bar .btn { padding:10px 18px; font-size:0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <div class="app-header">
+    <div class="eyebrow">Ассоциация студенческих инициатив · занятие 2</div>
+    <h1>Карта моих <span>4К</span></h1>
+    <p>Твоя личная карта навыков будущего. Выбери ситуацию, заполни блоки ментальной карты и отправь работу куратору.</p>
+    <div class="chips">
+      <div class="chip"><span>01</span>Креативность</div>
+      <div class="chip"><span>02</span>Критическое мышление</div>
+      <div class="chip"><span>03</span>Коммуникация</div>
+      <div class="chip"><span>04</span>Кооперация</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-text">ПРОГРЕСС</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-percent" id="progressPercent">0%</div>
+  </div>
+
+  <div class="card" id="card-reg">
+    <div class="card-tag">Шаг 0</div>
+    <h2>👤 <span class="accent">Регистрация</span></h2>
+    <p class="desc">Заполни данные, чтобы куратор знал, кто выполнил задание.</p>
+    <div class="input-group">
+      <label>Фамилия и имя *</label>
+      <input type="text" id="regName" placeholder="Например: Иванова Мария">
+    </div>
+    <div class="input-group">
+      <label>Группа / направление *</label>
+      <input type="text" id="regGroup" placeholder="Например: 26М-МГО11">
+    </div>
+    <div class="input-group">
+      <label>Контакт для связи (Telegram / VK)</label>
+      <input type="text" id="regContact" placeholder="@username">
+    </div>
+  </div>
+
+  <div class="card" id="card-step1">
+    <div class="card-tag">Этап 01</div>
+    <h2>🎯 <span class="accent">Выбери свою ситуацию</span></h2>
+    <p class="desc">Выбери один вариант или придумай собственный. Все задания выполняются индивидуально, команда не нужна.</p>
+    <div class="options">
+      <label><input type="radio" name="scenario" value="Организовать студенческое мероприятие"><span>🎉 Организовать студенческое мероприятие</span></label>
+      <label><input type="radio" name="scenario" value="Запустить полезную инициативу для студентов"><span>🌱 Запустить полезную инициативу</span></label>
+      <label><input type="radio" name="scenario" value="Подготовить командный учебный проект"><span>📚 Подготовить учебный проект</span></label>
+      <label><input type="radio" name="scenario" value="Моя собственная идея"><span>💡 Придумать собственную идею</span></label>
+    </div>
+    <div class="input-group">
+      <label>Моя идея / ситуация (если выбрал(а) свой вариант)</label>
+      <input type="text" id="ownScenario" placeholder="Например: организовать обмен книгами в университете">
+    </div>
+  </div>
+
+  <div class="card" id="card-step2">
+    <div class="card-tag">Этап 02</div>
+    <h2>🗺️ <span class="accent">Заполни ментальную карту</span></h2>
+    <p class="desc">В центре укажи свою идею, а в четырёх блоках вокруг неё ключевые слова, вопросы и решения. Коротко и по существу.</p>
+    <div class="mapwrap">
+      <div class="mindmap">
+        <div class="maptitle">МОЯ ИДЕЯ → 4 НАВЫКА → РЕШЕНИЕ</div>
+        <div class="mapbranch creative">
+          <h3>01 / КРЕАТИВНОСТЬ</h3>
+          <p>Какие есть нестандартные решения? Придумай минимум два.</p>
+          <textarea id="creativity" placeholder="Идея 1…&#10;Идея 2…"></textarea>
+        </div>
+        <div class="mapcenter">
+          <b>ЦЕНТР КАРТЫ</b>
+          <label for="mapIdea">Моя ситуация / идея:</label>
+          <input id="mapIdea" type="text" placeholder="Короткое название">
+        </div>
+        <div class="mapbranch critical">
+          <h3>02 / КРИТИЧЕСКОЕ МЫШЛЕНИЕ</h3>
+          <p>Что известно? Что я предполагаю? Что стоит проверить?</p>
+          <textarea id="critical" placeholder="Факты…&#10;Предположения…&#10;Что проверить…"></textarea>
+        </div>
+        <div class="mapbranch comm">
+          <h3>03 / КОММУНИКАЦИЯ</h3>
+          <p>Кому объяснить идею? Как донести её ясно и уважительно?</p>
+          <textarea id="communication" placeholder="Кому и что я скажу? Как проверю, что меня поняли?"></textarea>
+        </div>
+        <div class="connection">
+          <label for="connection">КАК СВЯЗАНЫ 4К?</label>
+          <textarea id="connection" placeholder="Как навыки дополняют друг друга?"></textarea>
+        </div>
+        <div class="mapbranch coop">
+          <h3>04 / КООПЕРАЦИЯ</h3>
+          <p>Какие роли нужны? Как договориться и распределить ответственность?</p>
+          <textarea id="cooperation" placeholder="Роли…&#10;Вклад…&#10;Договорённости…"></textarea>
+        </div>
+      </div>
+    </div>
+    <p class="mapnote">На телефоне карту можно прокручивать по горизонтали.</p>
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <button class="btn secondary" onclick="saveDraft()">💾 Сохранить черновик</button>
+  <button class="btn" onclick="submitAll()">📤 Отправить куратору</button>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>✅ Готово! Скопируй и отправь куратору</h3>
+    <p>Ниже — твои ответы в удобном формате. Скопируй текст и отправь его куратору в Telegram или ВК.</p>
+    <textarea id="resultText" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn" onclick="copyResult()">📋 Скопировать</button>
+      <button class="btn secondary" onclick="downloadResult()">⬇️ Скачать .txt</button>
+      <button class="btn secondary" onclick="closeModal()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = {
+  reg: { name:'', group:'', contact:'' },
+  scenario: '',
+  ownScenario: '',
+  mapIdea: '',
+  creativity: '',
+  critical: '',
+  communication: '',
+  cooperation: '',
+  connection: ''
+};
+
+function collectData() {
+  state.reg.name = document.getElementById('regName').value.trim();
+  state.reg.group = document.getElementById('regGroup').value.trim();
+  state.reg.contact = document.getElementById('regContact').value.trim();
+  const sel = document.querySelector('input[name="scenario"]:checked');
+  state.scenario = sel ? sel.value : '';
+  state.ownScenario = document.getElementById('ownScenario').value.trim();
+  state.mapIdea = document.getElementById('mapIdea').value.trim();
+  state.creativity = document.getElementById('creativity').value.trim();
+  state.critical = document.getElementById('critical').value.trim();
+  state.communication = document.getElementById('communication').value.trim();
+  state.cooperation = document.getElementById('cooperation').value.trim();
+  state.connection = document.getElementById('connection').value.trim();
+}
+
+function restoreData() {
+  document.getElementById('regName').value = state.reg.name || '';
+  document.getElementById('regGroup').value = state.reg.group || '';
+  document.getElementById('regContact').value = state.reg.contact || '';
+  document.getElementById('ownScenario').value = state.ownScenario || '';
+  document.getElementById('mapIdea').value = state.mapIdea || '';
+  document.getElementById('creativity').value = state.creativity || '';
+  document.getElementById('critical').value = state.critical || '';
+  document.getElementById('communication').value = state.communication || '';
+  document.getElementById('cooperation').value = state.cooperation || '';
+  document.getElementById('connection').value = state.connection || '';
+  document.querySelectorAll('input[name="scenario"]').forEach(r => {
+    r.checked = (r.value === state.scenario);
+  });
+}
+
+function updateProgress() {
+  collectData();
+  let filled = 0;
+  let total = 0;
+
+  total += 3;
+  if (state.reg.name) filled++;
+  if (state.reg.group) filled++;
+  if (state.reg.contact) filled++;
+
+  total += 1;
+  if (state.scenario && (state.scenario !== 'Моя собственная идея' || state.ownScenario)) filled++;
+
+  total += 6;
+  if (state.mapIdea) filled++;
+  if (state.creativity) filled++;
+  if (state.critical) filled++;
+  if (state.communication) filled++;
+  if (state.cooperation) filled++;
+  if (state.connection) filled++;
+
+  const percent = Math.round((filled / total) * 100);
+  document.getElementById('progressFill').style.width = percent + '%';
+  document.getElementById('progressPercent').textContent = percent + '%';
+}
+
+function saveDraft() {
+  collectData();
+  localStorage.setItem('asi_homework2_draft', JSON.stringify(state));
+  alert('✅ Черновик сохранён! Можешь вернуться позже — данные не потеряются.');
+}
+
+function loadDraft() {
+  const saved = localStorage.getItem('asi_homework2_draft');
+  if (saved) {
+    try {
+      state = JSON.parse(saved);
+      restoreData();
+      updateProgress();
+    } catch(e) { console.warn('Ошибка загрузки черновика', e); }
+  }
+}
+
+function submitAll() {
+  collectData();
+  if (!state.reg.name || !state.reg.group) {
+    alert('⚠️ Пожалуйста, заполни имя и группу в блоке «Регистрация».');
+    document.getElementById('card-reg').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  if (!state.scenario && !state.ownScenario) {
+    alert('⚠️ Выбери ситуацию или придумай собственную в Этапе 1.');
+    document.getElementById('card-step1').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  if (!state.mapIdea || !state.creativity || !state.critical || !state.communication || !state.cooperation) {
+    alert('⚠️ Заполни центральную идею и все четыре блока карты в Этапе 2.');
+    document.getElementById('card-step2').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  const now = new Date();
+  const dateStr = now.toLocaleString('ru-RU');
+  const chosenScenario = state.scenario === 'Моя собственная идея'
+    ? ('Своя идея: ' + (state.ownScenario || '—'))
+    : (state.scenario || '—');
+
+  const text =
+`📋 ДОМАШНЕЕ ЗАДАНИЕ 2 · КАРТА МОИХ 4К · АСИ
+-
+👤 Имя: ${state.reg.name}
+🏫 Группа: ${state.reg.group}
+📞 Контакт: ${state.reg.contact || '—'}
+🕒 Дата отправки: ${dateStr}
+
+🎯 ЭТАП 1. СИТУАЦИЯ
+${chosenScenario}
+
+🗺️ ЭТАП 2. МЕНТАЛЬНАЯ КАРТА 4К
+
+💡 ЦЕНТР КАРТЫ: ${state.mapIdea}
+
+▸ 01 / КРЕАТИВНОСТЬ
+${state.creativity || '—'}
+
+▸ 02 / КРИТИЧЕСКОЕ МЫШЛЕНИЕ
+${state.critical || '—'}
+
+▸ 03 / КОММУНИКАЦИЯ
+${state.communication || '—'}
+
+▸ 04 / КООПЕРАЦИЯ
+${state.cooperation || '—'}
+
+🔗 КАК СВЯЗАНЫ 4К
+${state.connection || '—'}
+
+Отправлено из интерактивной среды АСИ`;
+
+  document.getElementById('resultText').value = text;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function copyResult() {
+  const ta = document.getElementById('resultText');
+  ta.select();
+  document.execCommand('copy');
+  alert('📋 Скопировано! Вставь в сообщение куратору.');
+}
+
+function downloadResult() {
+  const text = document.getElementById('resultText').value;
+  const blob = new Blob([text], { type:'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ДЗ2_Карта_4К_' + (state.reg.name || 'участник').replace(/\s+/g,'_') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadDraft();
+  document.querySelectorAll('input, textarea').forEach(el => {
+    el.addEventListener('input', updateProgress);
+    el.addEventListener('change', updateProgress);
+  });
+  document.querySelectorAll('input[name="scenario"]').forEach(r => {
+    r.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+});
+</script>
+
+</body>
+</html>
